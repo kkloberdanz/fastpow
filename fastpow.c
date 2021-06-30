@@ -39,8 +39,8 @@ void fastmath_close() {
 
 int main() {
     fastmath_init();
-    printf("fastpowf(49, 0.5) = %f\n", fastpowf(48, 0.5));
-    printf("fastpowf(49, -0.5) = %f\n", fastpowf(48, -0.5));
+    printf("fastpowf(49, 0.5) = %f\n", fastpowf(49, 0.5));
+    printf("fastpowf(49, -0.5) = %f\n", fastpowf(49, -0.5));
     printf("fastpowf(3243423.07, 0.025) = %f\n", fastpowf(3243423.07, 0.025));
     fastmath_close();
     return 0;

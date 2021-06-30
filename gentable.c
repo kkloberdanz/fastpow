@@ -16,7 +16,9 @@ int main(void) {
     f.i = 0;
 
     for (i = 0; i < 32640; i++) {
-        const float ans = log(f.f);
+        float ans;
+        f.i |= 0x7fff; /* pad with mean of 0xffff and 0x0 for closer average case accuracy */
+        ans = log(f.f);
         f.i = i << 16;
         fwrite(&ans, sizeof(ans), 1, fp);
         //printf("%ld: log(%f) = %f\n", i, f.f, ans);
