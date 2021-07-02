@@ -21,7 +21,7 @@ int main(void) {
         ans = log(f.f);
         f.i = i << 16;
         fwrite(&ans, sizeof(ans), 1, fp);
-        //printf("%ld: log(%f) = %f\n", i, f.f, ans);
+        /*printf("%ld: log(%f) = %f\n", i, f.f, ans);*/
     }
 
     fclose(fp);

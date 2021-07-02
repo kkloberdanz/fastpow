@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 
 static float *tbl;
 static const size_t TABLE_SIZE = 130560;
@@ -17,7 +18,9 @@ float fastlogf(float x) {
     } else if (x == 0) {
         return -INFINITY;
     } else {
-        uint32_t index = *(uint32_t *)&x >> 16;
+        uint32_t index = 0;
+        memcpy(&index, &x, sizeof(index));
+        index = index >> 16;
         return tbl[index];
     }
 }
