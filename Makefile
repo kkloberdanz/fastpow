@@ -6,6 +6,10 @@ LDFLAGS=$(OPT) -lm
 release: OPT=-O3
 release: all
 
+.PHONY: debug
+debug: OPT=-O0 -ggdb3
+debug: all
+
 .PHONY: all
 all: fastpow pow-lookup-table.bin gentable
 
