@@ -6,13 +6,13 @@ import math
 def mylog(x, guess=x/10):
     '''
     instead of solving for ln(x) directly, solve for
-        f(x) = y - ln(x)
-        f(x) = exp(y) - exp(ln(x))
-        f(x) = exp(y) - x
+        f(y) = y - ln(x)
+        f(y) = exp(y) - exp(ln(x))
+        f(y) = exp(y) - x
 
-        f'(x) = exp(y)
+        f'(y) = exp(y)
 
-        f(x) / f'(x) = 1 - x / exp(x)
+        f(y) / f'(y) = 1 - x / exp(x)
     '''
 
     close_to_zero = 1e-15
