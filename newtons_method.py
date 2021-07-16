@@ -1,6 +1,8 @@
 import math
 
 
+# TODO: generate lookup table for guesses, based on truncated floating point
+#       numbers as the index
 def mylog(x, guess=x/10):
     '''
     instead of solving for ln(x) directly, solve for
@@ -12,6 +14,7 @@ def mylog(x, guess=x/10):
 
         f(x) / f'(x) = 1 - x / exp(x)
     '''
+
     close_to_zero = 1e-15
     if abs(x) < close_to_zero:
         return 1
