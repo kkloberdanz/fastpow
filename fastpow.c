@@ -39,14 +39,15 @@ static float newtons_method_log(float x, float guess) {
 
     for (i = 0; i < 4; i++) {
         y_old = y_new;
-        y_new = y_new - 1 + x / expf(y_new);
+        y_new = y_new - 1.0f + x / expf(y_new);
 #if 0
         if (fabsf(y_old - y_new) < CLOSE_TO_ZERO) {
             /*printf("converged after %lu iterations\n", i);*/
             break;
         }
 #endif
-    }
+
+    } /* end for */
 
     if (fabsf(y_new) < CLOSE_TO_ZERO) {
         return 0;
