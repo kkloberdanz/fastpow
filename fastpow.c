@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include "log_table.h"
 
 #define TIMEIT(stmt, time_buffer)                                             \
     do {                                                                      \
@@ -27,9 +28,35 @@
             (1000000 * _ksm_start.tv_sec + _ksm_start.tv_usec);               \
     } while (0)
 
-static float *tbl;
-static const size_t TABLE_SIZE = 130560;
-static int table_fd = 0;
+/*static float *tbl;*/
+static const size_t TABLE_SIZE = 4096;
+/*static int table_fd = 0;*/
+
+static float newtons_method_log(float x, float guess) {
+    const float close_to_zero = 1e-10;
+    float y_new = guess;
+    size_t i = 0;
+    float y_old;
+
+    if (fabsf(x) < close_to_zero) {
+        return 1;
+    }
+
+    for (i = 0; i < 4; i++) {
+        y_old = y_new;
+        y_new = y_new - 1 + x / exp(y_new);
+        if (fabsf(y_old - y_new) < close_to_zero) {
+            /*printf("converged after %lu iterations\n", i);*/
+            break;
+        }
+    }
+
+    if (fabsf(y_new) < close_to_zero) {
+        return 0;
+    } else {
+        return y_new;
+    }
+}
 
 static void *check_malloc(size_t nbytes) {
     void *ptr = malloc(nbytes);
@@ -48,11 +75,13 @@ float fastlogf(float x) {
     } else {
         uint32_t index = 0;
         memcpy(&index, &x, sizeof(index));
-        index = index >> 16;
-        if (index > TABLE_SIZE) {
+        index = index >> 21;
+        if (index > (TABLE_SIZE / sizeof(*log_table))) {
             return NAN;
         } else {
-            return tbl[index];
+            const float guess = log_table[index];
+            const float y = newtons_method_log(x, guess);
+            return y;
         }
     }
 }
@@ -61,16 +90,22 @@ float fastpowf(float x, float y) {
     return expf(y * fastlogf(x));
 }
 
+/*
 int fastmath_init() {
-    table_fd = open("pow-lookup-table.bin", O_RDONLY);
-    tbl = mmap(NULL, TABLE_SIZE, PROT_READ, MAP_SHARED, table_fd, 0);
-    return tbl != MAP_FAILED;
+    if (!table_fd) {
+        table_fd = open("pow-lookup-table.bin", O_RDONLY);
+        tbl = mmap(NULL, TABLE_SIZE, PROT_READ, MAP_SHARED, table_fd, 0);
+        return tbl != MAP_FAILED;
+    } else {
+        return -1;
+    }
 }
 
 void fastmath_close() {
     munmap(tbl, TABLE_SIZE);
     close(table_fd);
 }
+*/
 
 static double mse(float *actual, float *predicted, size_t nmemb) {
     double acc = 0.0;
@@ -81,9 +116,9 @@ static double mse(float *actual, float *predicted, size_t nmemb) {
         if (isnan(actual[i]) || isinf(actual[i])) {
             continue;
         }
-        acc += residual * residual;
+        acc += (residual * residual) / nmemb;
     }
-    return acc / nmemb;
+    return acc;
 }
 
 int main() {
@@ -95,7 +130,7 @@ int main() {
     size_t i = 0;
     long runtime = 0;
 
-    fastmath_init();
+    /*fastmath_init();*/
     srand(42);
 
     printf("fastpowf(49, 0.5) = %f\n", fastpowf(49, 0.5));
@@ -144,7 +179,7 @@ int main() {
     free(fastpow_results);
     free(libcpow_results);
 
-    fastmath_close();
+    /*fastmath_close();*/
     return 0;
 #undef N_FLOATS
 }
