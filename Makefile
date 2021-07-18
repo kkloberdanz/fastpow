@@ -11,14 +11,13 @@ debug: OPT=-O0 -ggdb3
 debug: all
 
 .PHONY: all
-all: fastpow gentable
-#all: fastpow pow-lookup-table.bin gentable
+all: fastpow pow-lookup-table.bin gentable
 
 fastpow: fastpow.c
 	$(CC) -o fastpow fastpow.c $(CFLAGS) $(LDFLAGS)
 
-#pow-lookup-table.bin: gentable
-#	./gentable
+pow-lookup-table.bin: gentable
+	./gentable
 
 gentable: gentable.c
 	$(CC) -o gentable gentable.c $(CFLAGS) $(LDFLAGS)
