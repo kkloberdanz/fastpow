@@ -32,22 +32,49 @@ static const size_t TABLE_SIZE = 130560;
 static int table_fd = 0;
 static const float CLOSE_TO_ZERO = 1e-10;
 
+union FloatAsInt {
+    uint32_t i;
+    float f;
+};
+
+static float get_guess(float x) {
+    const uint32_t exponent_mask = 0x3f800000;
+    float guess;
+    union FloatAsInt x_as_int;
+    uint32_t exponent;
+
+    x_as_int.f = x;
+    exponent = (x_as_int.i & exponent_mask) >> 23;
+    guess = exponent;
+    return guess;
+}
+
 static float newtons_method_log(float x, float guess) {
     float y_new = guess;
     size_t i = 0;
     float y_old;
 
-    for (i = 0; i < 4; i++) {
+#if 0
+    for (i = 0; i < 1000; i++) {
         y_old = y_new;
         y_new = y_new - 1.0f + x / expf(y_new);
-#if 0
         if (fabsf(y_old - y_new) < CLOSE_TO_ZERO) {
-            /*printf("converged after %lu iterations\n", i);*/
+            printf("converged after %lu iterations\n", i);
             break;
         }
-#endif
 
-    } /* end for */
+    }
+#endif
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
+    y_new = y_new - 1.0f + x / expf(y_new);
 
     if (fabsf(y_new) < CLOSE_TO_ZERO) {
         return 0;
@@ -79,8 +106,11 @@ float fastlogf(float x) {
         if (index > (TABLE_SIZE / sizeof(*tbl))) {
             return NAN;
         } else {
-            const float guess = tbl[index];
-            const float y = newtons_method_log(x, guess);
+            /*const float guess = tbl[index];*/
+            const float guess = get_guess(x);
+            float y;
+            /*printf("ln(%f): guess: %f actual: %f\n", x, guess, logf(x));*/
+            y = newtons_method_log(x, guess);
             return y;
         }
     }
@@ -148,12 +178,14 @@ int main() {
     libcpow_results = check_malloc(N_FLOATS * sizeof(float));
 
     for (i = 0; i < N_FLOATS; i++) {
-        const float a = 1e10;
+        const float a = rand() % 100000;
         float r1 = ((float)rand()/(float)(RAND_MAX)) * a;
         float r2 = ((float)rand()/(float)(RAND_MAX)) * a;
 
+        /*
         r1 /= a;
         r2 /= a;
+        */
 
         /*printf("r1 = %f r2 = %f\n", r1, r2);*/
         bases[i] = r1;
