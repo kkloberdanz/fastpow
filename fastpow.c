@@ -234,6 +234,10 @@ float fastlogf(float x) {
     } else if (fabsf(x) < CLOSE_TO_ZERO) {
         return 1;
     } else {
+        const float guess = get_guess(x);
+        float y = newtons_method_log(x, guess);
+        return y;
+#if 0
         uint32_t index = 0;
         memcpy(&index, &x, sizeof(index));
         index = index >> 16;
@@ -247,6 +251,7 @@ float fastlogf(float x) {
             y = newtons_method_log(x, guess);
             return y;
         }
+#endif
     }
 }
 
