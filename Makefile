@@ -7,8 +7,12 @@ release: OPT=-O3 -march=native -mtune=native -ggdb3
 release: all
 
 .PHONY: debug
-debug: OPT=-O0 -ggdb3
+debug: OPT=-O0 -ggdb3 -march=native -mtune=native
 debug: all
+
+.PHONY: sanitize
+sanitize: OPT=-fsanitize=address -ggdb3 -march=native -mtune=native
+sanitize: all
 
 .PHONY: all
 all: fastpow pow-lookup-table.bin gentable
@@ -22,8 +26,10 @@ pow-lookup-table.bin: gentable
 gentable: gentable.c
 	$(CC) -o gentable gentable.c $(CFLAGS) $(LDFLAGS)
 
+# to enable perf, as root run:
+# echo "-1" | tee /proc/sys/kernel/perf_event_paranoid
 .PHONY: perf
-perf: fastpow pow-lookup-table.bin
+perf: release
 	perf record ./fastpow
 	perf report
 
